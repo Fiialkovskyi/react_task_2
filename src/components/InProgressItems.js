@@ -12,10 +12,6 @@ const InProgressItems = ({ name, isActive, isNext}) => {
   }
 
   const startTask = (e) => {
-    console.log('started');
-    console.log(e.target.parentElement.id);
-    todos.in_progress.filter(item => item.id === 4).isActive = true;
-    console.log(todos);
     dispatch(makeActive(e.target.parentElement.id))
   }
   return (

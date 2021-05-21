@@ -6,7 +6,8 @@ import Form from './components/Form';
 import SearchBar from './components/SearchBar';
 import Counter from './components/Counter';
 import DoneItems from './components/DoneItems';
-import InProgressItems from './components/InProgressItems'
+import InProgressItems from './components/InProgressItems';
+import Button from "./components/Button";
 import { bindActionCreators } from 'redux';
 import * as actions from './actions';
 
@@ -16,9 +17,7 @@ const App = props => {
     done: [],
   });
 
-  const { setTodos, todos, startLoad, fetching, endLoad, serchText } = props;
-  console.log('todos --->', todos);
-  const addInputRef = useRef();
+  const { setTodos, todos, startLoad, fetching, endLoad, serchText, finishTodos } = props;
 
   useEffect(() => {
     (async () => {
@@ -55,9 +54,12 @@ const App = props => {
             loading
           ) : (
             <List>
-              {todos.in_progress.filter(item => item.name.toLowerCase().includes(serchText)).map((item, index) => {
+              {todos.in_progress && todos.in_progress.filter(item => item.name.toLowerCase().includes(serchText)).map((item, index) => {
                 const { id, isActive } = item;
-                item.isNext = index == 1 ? true : false;
+                if (index === 0) {
+                  item.isActive = true;
+                }
+                item.isNext = index === +1 ? true : false;
                 return (
                   <ListItem
                     key={id}
@@ -69,7 +71,8 @@ const App = props => {
               })}
             </List>
           )}
-          {!fetching && <Counter text='Things to do:' count={todos.in_progress.filter(item => item.name.toLowerCase().includes(serchText)).length} />}
+          {(!fetching && todos.in_progress) && <Counter text='Things to do:' count={todos.in_progress.filter(item => item.name.toLowerCase().includes(serchText)).length} />}
+          {(!fetching && todos.in_progress?.length === 1) && <Button classes="btn btn-success pull-right" text="Complete" onClickAction={finishTodos}/>}
         </div>
         <div className='col-xs-12 col-sm-6'>
           <h3>Done</h3>
@@ -78,13 +81,13 @@ const App = props => {
             loading
           ) : (
             <List>
-              {todos.done.filter(item => item.name.toLowerCase().includes(serchText)).map(({ id, ...item }) => (
+              {todos.done && todos.done.filter(item => item.name.toLowerCase().includes(serchText)).map(({ id, ...item }) => (
                 <ListItem key={id} item={item} render={DoneItems} />
               ))}
             </List>
           )}
 
-          {!fetching && <Counter text='Done:' count={todos.done.filter(item => item.name.toLowerCase().includes(serchText)).length}/>}
+          {(!fetching && todos.done) && <Counter text='Done:' count={todos.done.filter(item => item.name.toLowerCase().includes(serchText)).length}/>}
         </div>
       </div>
     </div>
@@ -97,16 +100,8 @@ const mapStateToProps = state => ({
   serchText: state.serchText,
 });
 
-// const mapDispatchToProps = dispatch => ({
-//   startLoad: () => dispatch(startLoad()),
-//   setTodos: list => dispatch(setTodos(list)),
-//   endLoad: () => {
-//     dispatch(endLoad());
-//   },
-// });
-
 const mapDispatchToProps = dispatch => {
-  const { startLoad, setTodos, endLoad } = bindActionCreators(
+  const { startLoad, setTodos, endLoad, finishTodos } = bindActionCreators(
     actions,
     dispatch
   );
@@ -115,6 +110,7 @@ const mapDispatchToProps = dispatch => {
     startLoad,
     endLoad,
     setTodos: list => setTodos(list),
+    finishTodos,
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(App);

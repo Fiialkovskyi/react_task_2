@@ -29,3 +29,7 @@ export const deleteTodo = id => ({
   type: 'DELETE_TODO_ITEM',
   payload: id,
 });
+
+export const finishTodos = () => ({
+  type: 'FINISH_TODOS',
+});

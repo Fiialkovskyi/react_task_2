@@ -37,21 +37,38 @@ const reducer = (state = initialState, action) => {
       return { ...state, todos: newTodos };
     }
     
-      case 'DELETE_TODO_ITEM': {
-        const { todos } = state;
-        const id = +action.payload;
-        const itemIdx = todos.in_progress.findIndex(item => item.id === id);
+    case 'DELETE_TODO_ITEM': {
+      const { todos } = state;
+      const id = +action.payload;
+      const itemIdx = todos.in_progress.findIndex(item => item.id === id);
 
-        if (itemIdx === -1) return state;
+      if (itemIdx === -1) return state;
 
-        const newInProgress = todos.in_progress.filter(item => item.id !== id);
-        const newTodos = {...todos};
-        newTodos.in_progress = [...newInProgress];
-        return { ...state, todos: newTodos};
-      }
+      const newInProgress = todos.in_progress.filter(item => item.id !== id);
+      const newTodos = {...todos};
+      newTodos.in_progress = [...newInProgress];
+      return { ...state, todos: newTodos};
+    }
 
-      case 'SET_SEARCH_TEXT':
-        return { ...state, serchText: action.payload };
+    case 'FINISH_TODOS': {
+      const { todos } = state;
+      const id = +action.payload;
+      const itemForDone = todos.in_progress[0];
+      itemForDone.isActive = false;
+      itemForDone.finishedTime = new Date().toISOString();
+      delete itemForDone.isNext;
+      const newTodos = {
+        in_progress: [],
+        done: [...todos.done, itemForDone]
+      };
+      // const newDone = [...newTodos.done];
+      console.log(itemForDone);
+
+      return { ...state, todos: newTodos};
+    }
+
+    case 'SET_SEARCH_TEXT':
+      return { ...state, serchText: action.payload };
     default:
       return state;
   }

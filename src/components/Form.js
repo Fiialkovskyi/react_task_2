@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from "react";
+import React, {useRef} from "react";
 import { connect } from 'react-redux';
 import Button from "./Button";
 import * as actions from '../actions';
@@ -11,7 +11,14 @@ const Form = (props) => {
     if (!props.fetching && addInputRef.current.value.length > 0) {
       const newTodos = {...props.todos}
       const inProgress = [...newTodos.in_progress];
-      const newInProgress = {id: inProgress[inProgress.length - 1].id + 1, name: addInputRef.current.value};
+      let newInProgress;
+      if (inProgress.length > 0) {
+        newInProgress = {id: inProgress[inProgress.length - 1].id + 1, name: addInputRef.current.value};
+      } else if (newTodos.done.length > 0) {
+        newInProgress = {id: newTodos.done[newTodos.done.length - 1].id + 1, name: addInputRef.current.value};
+      } else {
+        newInProgress = {id: 0, name: addInputRef.current.value};
+      }
       newTodos.in_progress = [...inProgress, newInProgress];
 
       setTodos(newTodos)
